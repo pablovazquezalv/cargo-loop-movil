@@ -151,7 +151,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                // Navega a la pantalla de crear pedido
+                Navigator.pushNamed(context, '/create_order');
+              },
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
