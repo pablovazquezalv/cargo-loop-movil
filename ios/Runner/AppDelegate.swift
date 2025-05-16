@@ -1,5 +1,5 @@
-import Flutter
 import UIKit
+import Flutter
 import GoogleMaps
 
 @main
@@ -8,8 +8,7 @@ import GoogleMaps
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-        GMSServices.provideAPIKey("AIzaSyA8S4LkpHL6A7FbGTNIQxnqf0D7fgO-mk8")
-
+    GMSServices.provideAPIKey("AIzaSyA8S4LkpHL6A7FbGTNIQxnqf0D7fgO-mk8")
     GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

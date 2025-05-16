@@ -4,6 +4,13 @@
     // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
+        {
+            "name": "Flutter: Attach to Device",
+            "type": "dart",
+            "request": "attach"
+        },
+
         
         {
             "name": "cargo-loop-movil",
@@ -21,6 +28,14 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
+        },
+        {
+            "name": "cargo-loop-movil (Flutter Pixel 5 API 35)",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "emulator-5554"  // Cambia esto al ID correcto de tu emulador
         }
+
+
     ]
 }
