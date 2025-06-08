@@ -143,7 +143,7 @@ class _CompanyInputsScreenState extends State<CompanyInputsScreen> {
                   ),
                   onPressed: () {
                     // Acción al crear cuenta
-                    Navigator.pushNamed(context, '/choise');
+                    Navigator.pushNamed(context, '/home');
                   },
                   child: Text(
                     'Crear Cuenta',

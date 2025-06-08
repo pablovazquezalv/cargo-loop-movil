@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CreateOrderScreen extends StatefulWidget {
   const CreateOrderScreen({super.key});
@@ -8,7 +9,6 @@ class CreateOrderScreen extends StatefulWidget {
 }
 
 class _CreateOrderScreenState extends State<CreateOrderScreen> {
-  bool isCreatingAccount = true;
   DateTime? _selectedDate;
   final TextEditingController _dateController = TextEditingController();
 
@@ -21,157 +21,159 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'CARGA LOOP',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromRGBO(26, 0, 176, 1),
-                ),
+      backgroundColor: const Color(0xFFF9F9F9),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Crear un Pedido',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2600B0),
               ),
-              SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Fecha de carga',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Caracteristicas del generador de carga',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            _buildTextField(
+              'Fecha de carga',
+              _dateController,
+              readOnly: true,
+              onTap: () => _selectDate(context),
+              suffixIcon: Icons.calendar_today,
+            ),
+            const SizedBox(height: 10),
+            //boton para el lugar de carga
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/mapa');
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2600B0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _dateController,
-                readOnly: true,
-                onTap: () => _selectDate(context),
-                decoration: InputDecoration(
-                  hintText: 'Selecciona una fecha',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                  suffixIcon: Icon(Icons.calendar_today),
+              child: const Text(
+                'Seleccionar lugar de carga',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 10),
+            _buildTextField(
+              'Lugar de Destino',
+              null,
+              suffixIcon: Icons.location_on,
+            ),
+            const SizedBox(height: 10),
+            _buildTextField('Tipo de Unidad', null),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2600B0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-
-              SizedBox(height: 20),
-              //boton para ir a selecciona la ubicación
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(26, 0, 176, 1),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () {
-                    // Acción al seleccionar ubicación
-                    Navigator.pushNamed(context, '/mapa');
-                  },
-                  child: Text(
-                    'Selecciona la ubicación',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+              child: const Text(
+                'Seleccionar tipo de Carga',
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
-
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Correo Electrónico',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: 'Ingresa tu correo',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
-              SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Contraseña',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Ingresa tu contraseña',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
-
-              SizedBox(height: 30),
-              //VERIFICAR CONTRASEÑA
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Verifica tu contraseña',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Ingresa de nuevo contraseña',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
-              SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(26, 0, 176, 1),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () {
-                    // Acción al crear cuenta
-                    Navigator.pushNamed(context, '/choise');
-                  },
-                  child: Text(
-                    'Crear Cuenta',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+            ),
+            const SizedBox(height: 20),
+            _buildTextField('Descripcion de la carga', null, maxLines: 4),
+            const SizedBox(height: 10),
+            _buildTextField('Especificacion de la carga', null),
+            const SizedBox(height: 10),
+            _buildTextField('Nombre de persona (contacto)', null),
+            const SizedBox(height: 10),
+            _buildTextField(
+              'Valor de Cargo',
+              null,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 20),
+            _buildFileUploadField('Adjuntar el Seguro de Carga'),
+            const SizedBox(height: 10),
+            _buildFileUploadField(
+              'Adjuntar Cartaporte (pesos ,valor de la carga)',
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              '¿Aplica Seguro?',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: RadioListTile(
+                    value: true,
+                    groupValue: true,
+                    onChanged: (value) {},
+                    title: const Text('Si'),
                   ),
                 ),
-              ),
-            ],
-          ),
+                Expanded(
+                  child: RadioListTile(
+                    value: false,
+                    groupValue: true,
+                    onChanged: (value) {},
+                    title: const Text('No'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _buildTextField('Observaciones', null, maxLines: 4),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+    String label,
+    TextEditingController? controller, {
+    bool readOnly = false,
+    VoidCallback? onTap,
+    int maxLines = 1,
+    IconData? suffixIcon,
+    TextInputType? keyboardType,
+  }) {
+    return TextField(
+      controller: controller,
+      readOnly: readOnly,
+      onTap: onTap,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        suffixIcon: suffixIcon != null ? Icon(suffixIcon) : null,
+      ),
+    );
+  }
+
+  Widget _buildFileUploadField(String label) {
+    return Container(
+      height: 150,
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Center(
+        child: Icon(Icons.image, size: 40, color: Colors.grey),
       ),
     );
   }
@@ -179,10 +181,9 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(1900),
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
       lastDate: DateTime(2100),
-      //     locale: const Locale("es", "ES"),
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {

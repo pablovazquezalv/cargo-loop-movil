@@ -9,6 +9,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isCreatingAccount = true;
+  final TextEditingController _phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -101,8 +102,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   onPressed: () {
-                    // Navega a la pantalla principal
-                    Navigator.pushNamed(context, '/home');
+                    // llamar a la función de inicio de sesión
+                    _login();
                   },
                   child: Text(
                     'Enviar Código',
@@ -119,5 +120,59 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _showErrorDialog(String message) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Error'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showSuccessDialog(String message) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Éxito'),
+          content: Text(message),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  //login
+  Future<void> _login() async {
+    final String phone = _phoneController.text.trim();
+
+    if (phone.isEmpty) {
+      await _showErrorDialog('Por favor, completa todos los campos.');
+      return;
+    }
+
+    // Simulación de inicio de sesión exitoso
+    await _showSuccessDialog('Inicio de sesión exitoso');
+    Navigator.pushNamed(context, '/home');
   }
 }

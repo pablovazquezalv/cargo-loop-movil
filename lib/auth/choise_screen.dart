@@ -67,7 +67,7 @@ class _ChoiseScreenState extends State<ChoiseScreen> {
               ElevatedButton(
                 onPressed: () {
                   // Navega a la pantalla de usuario
-                  Navigator.pushNamed(context, '/verify');
+                  Navigator.pushNamed(context, '/home');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(26, 0, 176, 1),

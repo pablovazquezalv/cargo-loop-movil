@@ -68,7 +68,7 @@ class _VerifiedPhoneScreenState extends State<VerifiedPhoneScreen> {
                   onPressed: () {
                     // Aquí puedes agregar la lógica para verificar el código
                     // y navegar a la siguiente pantalla.
-                    Navigator.pushNamed(context, '/login');
+                    Navigator.pushNamed(context, '/home');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromRGBO(26, 0, 176, 1),

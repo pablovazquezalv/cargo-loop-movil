@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_flutter_ios/google_maps_flutter_ios.dart';
 
 class MapaScreen extends StatefulWidget {
   const MapaScreen({super.key});
@@ -10,15 +9,21 @@ class MapaScreen extends StatefulWidget {
 }
 
 class _MapaScreenState extends State<MapaScreen> {
-  LatLng initialPosition = LatLng(19.4326, -99.1332);
+  final LatLng initialPosition = LatLng(19.4326, -99.1332);
   final CameraPosition initialCameraPosition = CameraPosition(
     target: LatLng(19.4326, -99.1332),
     zoom: 14,
   );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(initialCameraPosition: initialCameraPosition),
+      appBar: AppBar(title: const Text("Mapa")),
+      body: GoogleMap(
+        initialCameraPosition: initialCameraPosition,
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
+      ),
     );
   }
 }
