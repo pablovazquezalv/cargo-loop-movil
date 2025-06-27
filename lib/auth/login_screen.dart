@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -9,13 +10,16 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isCreatingAccount = true;
-  final TextEditingController _phoneController = TextEditingController();
+  bool _obscurePassword = true;
+
+  final TextEditingController _mailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
           child: Column(
@@ -25,8 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 'CARGA LOOP',
                 style: TextStyle(
                   fontSize: 32,
-                  fontWeight:
-                      FontWeight.bold, //Color.fromRGBO(26, 0, 176, 107),
+                  fontWeight: FontWeight.bold,
                   color: const Color.fromRGBO(26, 0, 176, 1),
                 ),
               ),
@@ -46,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      // Navega a la pantalla de inicio de sesión
                       Navigator.pushNamed(context, '/login');
                     },
                     child: Padding(
@@ -56,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // Navega a la pantalla de registro
                       Navigator.pushNamed(context, '/register');
                     },
                     child: Padding(
@@ -66,20 +67,56 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-
               SizedBox(height: 40),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Teléfono',
+                  'Correo',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
               SizedBox(height: 10),
               TextField(
-                keyboardType: TextInputType.phone,
+                controller: _mailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: 'Ingresa tu número',
+                  hintText: 'Ingresa tu correo',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: Color.fromRGBO(26, 0, 176, 1),
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                ),
+              ),
+              SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Contraseña',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                decoration: InputDecoration(
+                  hintText: 'Ingresa tu contraseña',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(
@@ -101,12 +138,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: () {
-                    // llamar a la función de inicio de sesión
-                    _login();
-                  },
+                  onPressed: _login,
                   child: Text(
-                    'Enviar Código',
+                    'Iniciar sesión',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -162,16 +196,19 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  //login
   Future<void> _login() async {
-    final String phone = _phoneController.text.trim();
+    final String mail = _mailController.text.trim();
+    final String password = _passwordController.text.trim();
 
-    if (phone.isEmpty) {
+    if (mail.isEmpty || password.isEmpty) {
       await _showErrorDialog('Por favor, completa todos los campos.');
       return;
     }
 
     // Simulación de inicio de sesión exitoso
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true); // Guardar estado de sesión
+
     await _showSuccessDialog('Inicio de sesión exitoso');
     Navigator.pushNamed(context, '/home');
   }

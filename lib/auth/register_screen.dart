@@ -1,3 +1,4 @@
+import 'package:cargo_loop_app/auth/services/auth.dart';
 import 'package:flutter/material.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -8,7 +9,56 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  bool isCreatingAccount = true;
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _lastNameController = TextEditingController(); // <-- nuevo
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  final AuthService _authService = AuthService();
+
+  bool _loading = false;
+  String? _errorMessage;
+
+  Future<void> _registerUser() async {
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
+
+    final result = await _authService.registerUser(
+      name: _nameController.text,
+      email: _emailController.text,
+      lastName: _lastNameController.text, // <-- nuevo
+
+      password: _passwordController.text,
+      confirmPassword: _confirmPasswordController.text,
+      phone: _phoneController.text,
+    );
+
+    setState(() => _loading = false);
+
+    //si el registro es exitoso, redirigir al usuario a la pantalla de inicio de sesión
+    if (result['success']) {
+      Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      setState(() {
+        _errorMessage = result['message'];
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,176 +67,157 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'CARGA LOOP',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromRGBO(26, 0, 176, 1),
-                ),
-              ),
-              SizedBox(height: 40),
-              ToggleButtons(
-                isSelected: [!isCreatingAccount, isCreatingAccount],
-                onPressed: (int index) {
-                  setState(() {
-                    isCreatingAccount = index == 1;
-                  });
-                },
-                borderRadius: BorderRadius.circular(8),
-                selectedColor: Colors.white,
-                fillColor: Color.fromRGBO(26, 0, 176, 1),
-                borderColor: Color.fromRGBO(26, 0, 176, 1),
-                selectedBorderColor: Colors.blue.shade800,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/login');
-                      },
-                      child: Text('Iniciar Sesión'),
-                    ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const Text(
+                  'CARGA LOOP',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(26, 0, 176, 1),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
-                      child: Text('Crear Cuenta'),
-                    ),
+                ),
+                const SizedBox(height: 40),
+                if (_errorMessage != null)
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red),
                   ),
-                ],
-              ),
-              SizedBox(height: 40),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Nombre',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Ingresa tu nombre',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
-              SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Telefono',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: 'Ingresa tu numero',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
-              SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Correo Electrónico',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: 'Ingresa tu correo',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
-              SizedBox(height: 20),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Contraseña',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Ingresa tu contraseña',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
+                _buildLabel('Nombre'),
+                _buildTextField(_nameController, 'Ingresa tu nombre'),
+                _buildLabel('Apellido'),
+                _buildTextField(_lastNameController, 'Ingresa tu apellido'),
 
-              SizedBox(height: 30),
-              //VERIFICAR CONTRASEÑA
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Verifica tu contraseña',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-                ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Ingresa de nuevo contraseña',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
-              SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color.fromRGBO(26, 0, 176, 1),
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: () {
-                    // Acción al crear cuenta
-                    Navigator.pushNamed(context, '/choise');
+                _buildLabel('Teléfono'),
+                _buildTextField(
+                  _phoneController,
+                  'Ingresa tu número',
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Campo obligatorio';
+                    }
+                    if (value.length > 10) {
+                      return 'Máximo 10 dígitos';
+                    }
+                    return null;
                   },
-                  child: Text(
-                    'Crear Cuenta',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                ),
+
+                _buildLabel('Correo Electrónico'),
+                _buildTextField(
+                  _emailController,
+                  'Ingresa tu correo',
+                  keyboardType: TextInputType.emailAddress,
+                ),
+
+                _buildLabel('Contraseña'),
+                _buildTextField(
+                  _passwordController,
+                  'Ingresa tu contraseña',
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Campo obligatorio';
+                    }
+                    if (value.length < 8) {
+                      return 'Mínimo 8 caracteres';
+                    }
+                    return null;
+                  },
+                ),
+
+                _buildLabel('Verifica tu contraseña'),
+                _buildTextField(
+                  _confirmPasswordController,
+                  'Repite la contraseña',
+                  obscureText: true,
+                  validator: (value) {
+                    if (value != _passwordController.text) {
+                      return 'Las contraseñas no coinciden';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromRGBO(26, 0, 176, 1),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
+                    onPressed:
+                        _loading
+                            ? null
+                            : () {
+                              if (_formKey.currentState!.validate()) {
+                                _registerUser();
+                              }
+                            },
+                    child:
+                        _loading
+                            ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                            : const Text(
+                              'Crear Cuenta',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLabel(String label) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20, bottom: 10),
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+    TextEditingController controller,
+    String hint, {
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      validator:
+          validator ??
+          (value) =>
+              value == null || value.isEmpty ? 'Campo obligatorio' : null,
+      decoration: InputDecoration(
+        hintText: hint,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
       ),
     );
   }

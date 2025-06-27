@@ -5,6 +5,11 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Simulación de datos del usuario
+    const String nombre = 'Jesus Daniel Gasca Alvarado';
+    const String correo = 'jesusgasca@example.com';
+    const String telefono = '8711340531';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -23,80 +28,59 @@ class ProfileScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/Carga-loop-icon.png', width: 120),
-            const SizedBox(height: 16),
-            const Text(
-              'Perfil',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.blue,
-              ),
-            ),
-            const SizedBox(height: 20),
-            const CircleAvatar(
-              radius: 70,
-              backgroundColor: Colors.grey,
-              child: Icon(Icons.person, size: 100, color: Colors.white),
-            ),
-            const SizedBox(height: 20),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Nombre',
-                hintText: 'Jesus Daniel Gasca Alvarado',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Numero',
-                hintText: '8711340531',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade800,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: () {},
-              child: const Text(
-                'LICENCIA ACTIVA',
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/Carga-loop-icon.png', width: 120),
+              const SizedBox(height: 16),
+              const Text(
+                'Perfil',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.blue,
                 ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade800,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+              const SizedBox(height: 20),
+              const CircleAvatar(
+                radius: 70,
+                backgroundColor: Colors.grey,
+                child: Icon(Icons.person, size: 100, color: Colors.white),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Nombre'),
+                subtitle: Text(nombre),
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                leading: const Icon(Icons.email),
+                title: const Text('Correo'),
+                subtitle: Text(correo),
+              ),
+              const SizedBox(height: 10),
+              ListTile(
+                leading: const Icon(Icons.phone),
+                title: const Text('Teléfono'),
+                subtitle: Text(telefono),
+              ),
+              const SizedBox(height: 20),
+              OutlinedButton.icon(
+                onPressed: () {
+                  // Acción para cerrar sesión
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+                icon: const Icon(Icons.logout, color: Colors.red),
+                label: const Text('Salir', style: TextStyle(color: Colors.red)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.red),
                 ),
               ),
-              onPressed: () {},
-              child: const Text(
-                'Guardar',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

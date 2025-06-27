@@ -28,6 +28,11 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+<string>Necesitamos acceso a tus fotos para subir el seguro de carga.</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Necesitamos acceso a tu ubicación para autocompletar direcciones.</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
