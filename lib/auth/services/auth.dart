@@ -4,12 +4,12 @@ import 'package:cargo_loop_app/utils/api_constants.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  Future<User?> login(String phone) async {
+  Future<User?> login(String phone, String password) async {
     try {
       final response = await http.post(
         Uri.parse('${ApiConstants.baseUrl}/client/loginWithMail'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': phone}),
+        body: jsonEncode({'email': phone, 'password': password}),
       );
 
       if (response.statusCode == 200) {

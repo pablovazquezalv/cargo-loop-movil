@@ -1,3 +1,4 @@
+import 'package:cargo_loop_app/auth/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -205,10 +206,19 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    // Simulación de inicio de sesión exitoso
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', true); // Guardar estado de sesión
+    final authService = AuthService();
+    final user = await authService.login(
+      mail,
+      password,
+    ); // Aquí falta validar también la contraseña
 
+    if (user == null) {
+      await _showErrorDialog('Correo o contraseña incorrectos.');
+      return;
+    }
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', true);
     await _showSuccessDialog('Inicio de sesión exitoso');
     Navigator.pushNamed(context, '/home');
   }
