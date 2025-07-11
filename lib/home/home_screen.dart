@@ -1,30 +1,24 @@
-import 'package:cargo_loop_app/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:cargo_loop_app/profile/profile_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   final int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    Container(child: Center(child: Text("Inicio"))),
-    // MisPedidosScreen(),  // Asegúrate de importar esta pantalla si la usas
-    ProfileScreen(),
-    ProfileScreen(),
-  ];
-
   void _onItemTapped(int index) {
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, '/home');
+        // Ya estás en home
         break;
       case 1:
-        Navigator.pushNamed(context, '/profile'); // Ruta para 'Mis Pedidos'
+        Navigator.pushNamed(context, '/profile');
         break;
       case 2:
         Navigator.pushNamed(context, '/profile');
@@ -32,196 +26,229 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  String nombre = '';
+  @override
+  void initState() {
+    super.initState();
+    _loadInfoUser();
+  }
+
+  Future<void> _loadInfoUser() async {
+    // Aquí puedes cargar la información del usuario desde SharedPreferences o tu servicio de autenticación
+    // Por ejemplo:
+    final prefs = await SharedPreferences.getInstance();
+
+    final userName = prefs.getString('user_name') ?? 'Usuario';
+    setState(() {
+      nombre = userName;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: SizedBox(
-          height: 60,
-          child: Image.asset('assets/images/Carga-loop-icon.png'),
-        ),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(
-              Icons.notifications_outlined,
-              color: Colors.black,
-              size: 28,
-            ),
+    return WillPopScope(
+      onWillPop: () async => false, // Evita que se regrese con botón físico
+      child: Scaffold(
+        backgroundColor: Colors.grey[100],
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 2,
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          title: SizedBox(
+            height: 60,
+            child: Image.asset('assets/images/Carga-loop-icon.png'),
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundColor: Colors.grey.shade300,
-                  child: Icon(Icons.person, size: 40, color: Colors.white),
-                ),
-                SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hola!',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'Bienvenido Jesus Daniel',
-                      style: TextStyle(fontSize: 18, color: Colors.black54),
-                    ),
-                  ],
-                ),
-              ],
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Icon(Icons.notifications_outlined, color: Colors.black),
             ),
-            SizedBox(height: 30),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade400, width: 1.5),
-              ),
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header de usuario
+              Row(
                 children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.deepPurple,
+                    child: Icon(Icons.person, size: 40, color: Colors.white),
+                  ),
+                  const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Tus Cargas en Tiempo real\nhas click para ver tus Pedido Actuales',
+                        'Hola!',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          side: BorderSide(color: Colors.green, width: 2),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
+                      Text(
+                        'Bienvenido ${nombre.isNotEmpty ? (nombre.length > 18 ? nombre.substring(0, 18) + '…' : nombre) : "Usuario"}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black54,
                         ),
-                        onPressed: () {},
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
+
+              // Card de pedido en vivo
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade300),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.shade300,
+                      blurRadius: 6,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Tus Cargas en Tiempo real\nHaz click para ver tus Pedidos Actuales',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(
+                              Icons.circle,
+                              color: Colors.red,
+                              size: 12,
+                            ),
+                            label: const Text(
                               'EN VIVO',
                               style: TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(width: 5),
-                            Icon(Icons.circle, color: Colors.red, size: 10),
-                          ],
-                        ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              side: const BorderSide(color: Colors.green),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  //  Image.asset('assets/truck.png', width: 100),
-                ],
-              ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromRGBO(26, 0, 176, 1),
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 40,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                    ),
+                  ],
                 ),
               ),
-              onPressed: () {
-                // Navega a la pantalla de crear pedido
-                Navigator.pushNamed(context, '/create_order');
-              },
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
+              const SizedBox(height: 20),
+
+              // Botón de crear pedido
+              Center(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/create_order');
+                  },
+                  icon: const Icon(Icons.add, color: Colors.white),
+                  label: const Text(
                     'Crea un Pedido',
                     style: TextStyle(fontSize: 18, color: Colors.white),
                   ),
-                  SizedBox(width: 5),
-                  Icon(Icons.add, color: Colors.white),
-                ],
-              ),
-            ),
-            SizedBox(height: 30),
-            Text(
-              'Mis Pedidos',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    //  leading: Image.asset('assets/package.png', width: 50),
-                    title: Text(
-                      'ID-00078\n22/01/2024\nPropiedades Radio',
-                      style: TextStyle(fontSize: 16),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1A00B0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 14,
                     ),
-                    trailing: Text(
-                      '*Finalizado',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 10),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                'ver mas',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
+              const SizedBox(height: 30),
+
+              const Text(
+                'Mis Pedidos',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+
+              // Lista de pedidos
+              Expanded(
+                child: ListView.builder(
+                  itemCount: 3,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.local_shipping,
+                          color: Colors.blue.shade700,
+                        ),
+                        title: const Text(
+                          'ID-00078\n22/01/2024\nPropiedades Radio',
+                        ),
+                        trailing: Text(
+                          '*Finalizado',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // Ver más
+              Center(
+                child: TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Ver más',
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          selectedItemColor: Colors.deepPurple,
+          unselectedItemColor: Colors.grey.shade600,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list_alt),
+              label: 'Mis Pedidos',
             ),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'Mis Pedidos',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
-        selectedItemColor: Colors.blue.shade800,
       ),
     );
   }
