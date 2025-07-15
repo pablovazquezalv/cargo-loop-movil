@@ -29,13 +29,16 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
   String? _idUser;
 
   final TextEditingController _dateController = TextEditingController();
-  final TextEditingController _addressSearchController = TextEditingController();
-  final TextEditingController _deliveryAddressController = TextEditingController();
+  final TextEditingController _addressSearchController =
+      TextEditingController();
+  final TextEditingController _deliveryAddressController =
+      TextEditingController();
   final TextEditingController _descripcionController = TextEditingController();
   final TextEditingController _contactoController = TextEditingController();
   final TextEditingController _valor_cargaController = TextEditingController();
   final TextEditingController _cantidadController = TextEditingController();
-  final TextEditingController _observacionesController = TextEditingController();
+  final TextEditingController _observacionesController =
+      TextEditingController();
   final TextEditingController _tipoMaterialController = TextEditingController();
   final TextEditingController _tipoPagoController = TextEditingController();
   final TextEditingController _cartaporteController = TextEditingController();
@@ -70,6 +73,12 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _loadInfoUser(); // <- ahora sí se ejecuta al crear la pantalla
+  }
+
   Future<void> _selectImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -81,12 +90,11 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     }
   }
 
-
   Future<void> _loadInfoUser() async {
     // Aquí puedes cargar la información del usuario desde SharedPreferences o tu servicio de autenticación
     // Por ejemplo:
     final prefs = await SharedPreferences.getInstance();
-    final id = prefs.getString('user_id') ?? null ;
+    final id = prefs.getString('user_id') ?? null;
     setState(() {
       _idUser = id;
     });
@@ -130,7 +138,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
 
     try {
       var request = http.MultipartRequest('POST', Uri.parse(apiUrl));
-
+      print(_idUser);
       request.fields.addAll({
         "fecha_carga": _selectedDate!.toIso8601String(),
         "descripcion_carga": _descripcionController.text,
@@ -143,7 +151,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         "cartaporte": _cartaporteController.text,
         "estado_pedido": "disponible", // texto para API
         "id_company": "3", // <-- Reemplaza por la compañía real
-        "cliente_id": _idUser.toString() , // <-- Reemplaza por cliente real
+        "cliente_id": _idUser.toString(), // <-- Reemplaza por cliente real
         "ubicacion_recoger_lat": recogerLat.toString(),
         "ubicacion_recoger_long": recogerLong.toString(),
         "ubicacion_recoger_descripcion": _addressSearchController.text,
@@ -179,182 +187,186 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      print('Error: $e');
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      title: const Text(
-        "Crear Pedido",
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 22,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "Crear Pedido",
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
         ),
+        backgroundColor: const Color(0xFF2600B0),
+        elevation: 4,
+        centerTitle: true,
       ),
-      backgroundColor: const Color(0xFF2600B0),
-      elevation: 4,
-      centerTitle: true,
-    ),
-    backgroundColor: const Color(0xFFF5F5F5),
-    body: SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text(
-            'Datos del Pedido',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2600B0),
-            ),
-          ),
-          const SizedBox(height: 16),
-          _buildTextField(
-            '📅 Fecha de carga',
-            _dateController,
-            readOnly: true,
-            onTap: () => _selectDate(context),
-            suffixIcon: Icons.calendar_today,
-          ),
-          const SizedBox(height: 12),
-          _buildGooglePlacesField(
-            _addressSearchController,
-            '📍 Dirección de recogida',
-            onPlaceSelected: (lat, lng) {
-              recogerLat = lat;
-              recogerLong = lng;
-            },
-          ),
-          const SizedBox(height: 12),
-          _buildGooglePlacesField(
-            _deliveryAddressController,
-            '🏠 Dirección de entrega',
-            onPlaceSelected: (lat, lng) {
-              entregarLat = lat;
-              entregarLong = lng;
-            },
-          ),
-          const SizedBox(height: 12),
-          DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              labelText: '🚛 Tipo de Vehículo',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            value: selectedUnidad,
-            items: unidadOptions.map((unidad) {
-              return DropdownMenuItem(
-                value: unidad,
-                child: Text(unidad),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedUnidad = value;
-              });
-            },
-          ),
-          const SizedBox(height: 12),
-          _buildTextField('📦 Descripción de carga', _descripcionController),
-          const SizedBox(height: 8),
-          _buildTextField('🔢 Cantidad', _cantidadController,
-              keyboardType: TextInputType.number),
-          const SizedBox(height: 8),
-          _buildTextField('🛠️ Tipo de Material', _tipoMaterialController),
-          const SizedBox(height: 8),
-          _buildTextField('💳 Tipo de Pago', _tipoPagoController),
-          const SizedBox(height: 8),
-          _buildTextField('👤 Nombre Contacto', _contactoController),
-          const SizedBox(height: 8),
-          _buildTextField('💲 Valor Carga', _valor_cargaController,
-              keyboardType: TextInputType.number),
-          const SizedBox(height: 8),
-          _buildTextField('📄 Cartaporte', _cartaporteController),
-          const SizedBox(height: 8),
-        
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Checkbox(
-                value: aplicaSeguro,
-                onChanged: (value) {
-                  setState(() {
-                    aplicaSeguro = value ?? false;
-                  });
-                },
-                activeColor: const Color(0xFF2600B0),
-              ),
-              const Text(
-                "Aplica Seguro",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          ElevatedButton.icon(
-            onPressed: _selectImage,
-            icon: const Icon(Icons.upload_file, size: 20),
-            label: const Text('Seleccionar archivo de Seguro'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey[200],
-              foregroundColor: Colors.black87,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Datos del Pedido',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF2600B0),
               ),
             ),
-          ),
-          if (_selectedImage != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.file(
-                  _selectedImage!,
-                  height: 150,
-                  fit: BoxFit.cover,
+            const SizedBox(height: 16),
+            _buildTextField(
+              '📅 Fecha de carga',
+              _dateController,
+              readOnly: true,
+              onTap: () => _selectDate(context),
+              suffixIcon: Icons.calendar_today,
+            ),
+            const SizedBox(height: 12),
+            _buildGooglePlacesField(
+              _addressSearchController,
+              '📍 Dirección de recogida',
+              onPlaceSelected: (lat, lng) {
+                recogerLat = lat;
+                recogerLong = lng;
+              },
+            ),
+            const SizedBox(height: 12),
+            _buildGooglePlacesField(
+              _deliveryAddressController,
+              '🏠 Dirección de entrega',
+              onPlaceSelected: (lat, lng) {
+                entregarLat = lat;
+                entregarLong = lng;
+              },
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(
+                labelText: '🚛 Tipo de Vehículo',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+              value: selectedUnidad,
+              items:
+                  unidadOptions.map((unidad) {
+                    return DropdownMenuItem(value: unidad, child: Text(unidad));
+                  }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedUnidad = value;
+                });
+              },
+            ),
+            const SizedBox(height: 12),
+            _buildTextField('📦 Descripción de carga', _descripcionController),
+            const SizedBox(height: 8),
+            _buildTextField(
+              '🔢 Cantidad',
+              _cantidadController,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 8),
+            _buildTextField('🛠️ Tipo de Material', _tipoMaterialController),
+            const SizedBox(height: 8),
+            _buildTextField('💳 Tipo de Pago', _tipoPagoController),
+            const SizedBox(height: 8),
+            _buildTextField('👤 Nombre Contacto', _contactoController),
+            const SizedBox(height: 8),
+            _buildTextField(
+              '💲 Valor Carga',
+              _valor_cargaController,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 8),
+            _buildTextField('📄 Cartaporte', _cartaporteController),
+            const SizedBox(height: 8),
+
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Checkbox(
+                  value: aplicaSeguro,
+                  onChanged: (value) {
+                    setState(() {
+                      aplicaSeguro = value ?? false;
+                    });
+                  },
+                  activeColor: const Color(0xFF2600B0),
+                ),
+                const Text("Aplica Seguro", style: TextStyle(fontSize: 16)),
+              ],
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: _selectImage,
+              icon: const Icon(Icons.upload_file, size: 20),
+              label: const Text('Seleccionar archivo de Seguro'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey[200],
+                foregroundColor: Colors.black87,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
             ),
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: () => _submitOrder(context),
-            icon: const Icon(Icons.send, size: 22),
-            label: const Text(
-              'Enviar Pedido',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2600B0),
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+            if (_selectedImage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.file(
+                    _selectedImage!,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-              elevation: 3,
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () => _submitOrder(context),
+              icon: const Icon(Icons.send, size: 22),
+              label: const Text(
+                'Enviar Pedido',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2600B0),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 3,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-
-  Widget _buildTextField(String label, TextEditingController controller,
-      {bool readOnly = false,
-      VoidCallback? onTap,
-      IconData? suffixIcon,
-      TextInputType? keyboardType}) {
+  Widget _buildTextField(
+    String label,
+    TextEditingController controller, {
+    bool readOnly = false,
+    VoidCallback? onTap,
+    IconData? suffixIcon,
+    TextInputType? keyboardType,
+  }) {
     return TextField(
       controller: controller,
       readOnly: readOnly,

@@ -1,15 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Simulación de datos del usuario
-    const String nombre = 'Jesus Daniel Gasca Alvarado';
-    const String correo = 'jesusgasca@example.com';
-    const String telefono = '8711340531';
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
 
+class _ProfileScreenState extends State<ProfileScreen> {
+  String nombre = '';
+  String correo = '';
+  String telefono = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      nombre = prefs.getString('user_name') ?? '';
+      correo = prefs.getString('user_email') ?? '';
+      telefono = prefs.getString('user_phone') ?? '';
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -68,8 +88,9 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               OutlinedButton.icon(
-                onPressed: () {
-                  // Acción para cerrar sesión
+                onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear(); // Borra todos los datos
                   Navigator.pushReplacementNamed(context, '/login');
                 },
                 icon: const Icon(Icons.logout, color: Colors.red),
