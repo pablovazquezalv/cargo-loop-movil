@@ -12,6 +12,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String nombre = '';
   String correo = '';
   String telefono = '';
+  int _selectedIndex = 2; // Perfil está en el índice 2
 
   @override
   void initState() {
@@ -26,6 +27,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       correo = prefs.getString('user_email') ?? '';
       telefono = prefs.getString('user_phone') ?? '';
     });
+  }
+
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex) return;
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+      case 1:
+        Navigator.pushReplacementNamed(context, '/create_order');
+        break;
+      case 2:
+        Navigator.pushReplacementNamed(context, '/profile');
+        break;
+    }
   }
 
   @override
@@ -105,13 +122,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
         selectedItemColor: Colors.blue.shade800,
         unselectedItemColor: Colors.black,
+        onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Inicio'),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
-            label: 'Mis pedidos',
+            label: 'Crear Pedido',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],

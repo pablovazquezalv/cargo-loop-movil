@@ -96,6 +96,11 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
     final prefs = await SharedPreferences.getInstance();
     final id = prefs.getString('user_id') ?? null;
     setState(() {
+      if (id != null) {
+        _idUser = id;
+      } else {
+       _idUser = prefs.getInt('user_id')?.toString() ?? null;
+      }
       _idUser = id;
     });
   }
@@ -151,7 +156,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
         "cartaporte": _cartaporteController.text,
         "estado_pedido": "disponible", // texto para API
         "id_company": "3", // <-- Reemplaza por la compañía real
-        "cliente_id": _idUser.toString(), // <-- Reemplaza por cliente real
+        "cliente_id": _idUser.toString() , // <-- Reemplaza por cliente real
         "ubicacion_recoger_lat": recogerLat.toString(),
         "ubicacion_recoger_long": recogerLong.toString(),
         "ubicacion_recoger_descripcion": _addressSearchController.text,
@@ -182,6 +187,7 @@ class _CreateOrderScreenState extends State<CreateOrderScreen> {
           const SnackBar(content: Text('Pedido enviado exitosamente ✅')),
         );
       } else {
+        print('Error al enviar el pedido: $responseBody');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al enviar: $responseBody')),
         );

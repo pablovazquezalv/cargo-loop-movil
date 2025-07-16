@@ -1,3 +1,3 @@
 class ApiConstants {
-  static const baseUrl = 'https://cargo-loop.com/api';
+  static const baseUrl = 'http://192.168.100.210:8000/api';
 }

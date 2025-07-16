@@ -21,14 +21,33 @@ class AuthService {
         final token = data['token'];
         final userData = data['0']; // El objeto del usuario
 
-        // Guardar en SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token);
-        await prefs.setInt('user_id', userData['id']);
-        await prefs.setString('user_name', userData['name']);
-        await prefs.setString('user_email', userData['email']);
-        await prefs.setString('user_phone', userData['phone']);
-        await prefs.setString('user_rol_id', userData['rol_id']);
+
+        // Validar tipo antes de guardar en SharedPreferences
+        if (userData['id'] is int) {
+          await prefs.setInt('user_id', userData['id']);
+        } else if (userData['id'] is String) {
+          await prefs.setString('user_id', userData['id']);
+        }
+
+        if (userData['name'] is String) {
+          await prefs.setString('user_name', userData['name']);
+        }
+
+        if (userData['email'] is String) {
+          await prefs.setString('user_email', userData['email']);
+        }
+
+        if (userData['phone'] is String) {
+          await prefs.setString('user_phone', userData['phone']);
+        }
+
+        if (userData['rol_id'] is int) {
+          await prefs.setInt('user_rol_id', userData['rol_id']);
+        } else if (userData['rol_id'] is String) {
+          await prefs.setInt('user_rol_id', userData['rol_id'] is String ? int.parse(userData['rol_id']) : userData['rol_id']);
+        }
 
         print('Token y datos de usuario guardados correctamente.');
 

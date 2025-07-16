@@ -23,32 +23,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _errorMessage;
 
   Future<void> _registerUser() async {
-    setState(() {
-      _loading = true;
-      _errorMessage = null;
-    });
+  setState(() {
+    _loading = true;
+    _errorMessage = null;
+  });
 
-    final result = await _authService.registerUser(
-      name: _nameController.text,
-      email: _emailController.text,
-      lastName: _lastNameController.text, // <-- nuevo
+  final result = await _authService.registerUser(
+    name: _nameController.text,
+    email: _emailController.text,
+    lastName: _lastNameController.text,
+    password: _passwordController.text,
+    confirmPassword: _confirmPasswordController.text,
+    phone: _phoneController.text,
+  );
 
-      password: _passwordController.text,
-      confirmPassword: _confirmPasswordController.text,
-      phone: _phoneController.text,
-    );
+  setState(() => _loading = false);
 
-    setState(() => _loading = false);
-
-    //si el registro es exitoso, redirigir al usuario a la pantalla de inicio de sesión
-    if (result['success']) {
-      Navigator.pushReplacementNamed(context, '/login');
-    } else {
-      setState(() {
-        _errorMessage = result['message'];
-      });
-    }
+  if (result['success']) {
+    await _showSuccessDialog("Tu cuenta ha sido creada correctamente.");
+  } else {
+    await _showErrorDialog(result['message'] ?? "Error desconocido.");
   }
+}
+
 
   @override
   void dispose() {
@@ -59,6 +56,85 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _confirmPasswordController.dispose();
     super.dispose();
   }
+
+  Future<void> _showSuccessDialog(String message) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.check_circle, color: Colors.green, size: 28),
+            SizedBox(width: 10),
+            Text(
+              '¡Registro exitoso!',
+              style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Text(message, style: const TextStyle(fontSize: 16)),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.green,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Ir a Login'),
+            onPressed: () {
+              Navigator.pop(context); // Cierra el modal
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+Future<void> _showErrorDialog(String message) async {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: true,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.error_outline, color: Colors.red, size: 28),
+            SizedBox(width: 10),
+            Text(
+              'Error en registro',
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: Text(message, style: const TextStyle(fontSize: 16)),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Aceptar'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
